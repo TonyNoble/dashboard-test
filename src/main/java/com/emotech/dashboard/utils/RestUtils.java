@@ -8,6 +8,9 @@
  */
 package com.emotech.dashboard.utils;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -26,6 +29,7 @@ import com.google.gson.JsonParser;
 
 public class RestUtils {
   
+  private Log log = LogFactory.getLog(RestUtils.class) ;
   private JsonParser parser = new JsonParser() ;
       
   /**
@@ -34,6 +38,8 @@ public class RestUtils {
    * @return a JsonObject containing the result
    */
   public JsonObject getJsonObjectFromUrl( String urlString ) {
+  log.debug( "getJsonObjectFromUrl method invoked with single parameter" ) ;
+  log.debug( "urlString: " + urlString ) ;
     return this.getJsonObjectFromUrl( urlString , null ) ;
   }
     
@@ -45,14 +51,20 @@ public class RestUtils {
    * @return a JsonObject containing the result
    */
   public JsonObject getJsonObjectFromUrl( String urlString , String basicAuth ) {
+  log.debug( "getJsonObjectFromUrl method invoked with two parameters" ) ;
+  log.debug( "urlString: " + urlString ) ;
+  log.debug( "basicAuth: " + basicAuth ) ;
     try {
+      log.debug( "Invoking getJsonElementFromUrl with supplied parameters" ) ;
       JsonElement ele = this.getJsonElementFromUrl( urlString , basicAuth ) ;
       if( ele == null ) {
+      log.debug( "null element returned from getJsonElementFromUrl.  Returning empty JsonObject" ) ;
         return new JsonObject() ;
       } else {
+      log.debug( "JsonElement returned successfully" ) ;
         return ele.getAsJsonObject() ;
       }
-    } catch( Exception e ) { e.printStackTrace() ; } 
+    } catch( Exception e ) { log.error( "Exception thrown!" , e ) ; } 
     return new JsonObject() ;
   }
     
@@ -63,6 +75,8 @@ public class RestUtils {
    * @return a JsonArray object containing the result
    */
   public JsonArray getJsonArrayFromUrl( String urlString ) {
+  log.debug( "getJsonArrayFromUrl method invoked with single parameter" ) ;
+  log.debug( "urlString: " + urlString ) ;
     return this.getJsonArrayFromUrl( urlString , null ) ;
   }
       
@@ -74,14 +88,20 @@ public class RestUtils {
    * @return a JsonArray containing the result
    */
   public JsonArray getJsonArrayFromUrl( String urlString , String basicAuth ) {
+  log.debug( "getJsonArrayFromUrl method invoked with two parameters" ) ;
+  log.debug( "urlString: " + urlString ) ;
+  log.debug( "basicAuth: " + basicAuth ) ;
     try {
+      log.debug( "Invoking getJsonElementFromUrl with supplied parameters" ) ;
       JsonElement ele = this.getJsonElementFromUrl( urlString , basicAuth ) ;
       if( ele == null ) {
+      log.debug( "null element returned from getJsonElementFromUrl.  Returning empty JsonArray" ) ;
         return new JsonArray() ;
       } else {
+      log.debug( "JsonElement returned successfully" ) ;
         return ele.getAsJsonArray() ;
       }
-    } catch( Exception e ) { e.printStackTrace() ; } 
+    } catch( Exception e ) { log.error( "Exception thrown!" , e ) ; } 
     return new JsonArray() ;
   }
     
@@ -93,6 +113,9 @@ public class RestUtils {
    * @return a JsonElement containing the result
    */
   private JsonElement getJsonElementFromUrl( String urlString , String basicAuth ) {
+  log.debug( "getJsonElementFromUrl method invoked with two parameters" ) ;
+  log.debug( "urlString: " + urlString ) ;
+  log.debug( "basicAuth: " + basicAuth ) ;
     try {
       URL thisUrl = new URL( urlString ) ;
       URLConnection uc = thisUrl.openConnection();
@@ -104,15 +127,17 @@ public class RestUtils {
       InputStream in = uc.getInputStream();
       BufferedReader br = new BufferedReader(new InputStreamReader(in));
 
+      log.debug( "Parsing response from url" ) ;
       JsonElement ele = this.parser.parse(br) ;
 
       br.close();
       in.close();
             
+      log.debug( "Response parsed.  Returning JsonElement" ) ;
       return ele ;
             
     } catch( Exception e ) { 
-      e.printStackTrace() ;  
+      log.error( "Exception thrown!" , e ) ;
     }
     return null ;
   }
@@ -124,19 +149,27 @@ public class RestUtils {
    * @throws Exception - if a failure occurs at any point, an exception is thrown
    */
   public void postUrl( String destinationUrl , HashMap< String , String > parameters ) throws Exception {
-  	System.out.println( "POSTing to destination URL:" + destinationUrl );
+    log.debug( "getJsonElementFromUrl method invoked" ) ;
+    log.debug( "destinationUrl: " + destinationUrl ) ;
+
+    try {
       URL url = new URL( destinationUrl ) ;
 
       StringBuilder postData = new StringBuilder();
+    
+      log.debug( "POST data:" ) ;
       for (Map.Entry<String,String> param : parameters.entrySet()) {
-          if (postData.length() != 0) postData.append('&') ;
-          postData.append(URLEncoder.encode(param.getKey(), "UTF-8")) ;
-          postData.append('=') ;
-          postData.append(URLEncoder.encode(String.valueOf(param.getValue()), "UTF-8"));
+        log.debug( param.getKey() + ": " + param.getValue() ) ;
+        if ( postData.length() != 0 ) {
+          postData.append( '&' ) ;
+        }
+        postData.append(URLEncoder.encode(param.getKey(), "UTF-8")) ;
+        postData.append('=') ;
+        postData.append(URLEncoder.encode(String.valueOf(param.getValue()), "UTF-8"));
       }
       byte[] postDataBytes = postData.toString().getBytes("UTF-8");
     
-      System.out.println( "REQUEST BODY: " + postData.toString() ) ;
+      log.debug( "Sending request: " + postData.toString() ) ;
       HttpURLConnection conn = (HttpURLConnection)url.openConnection();
       conn.setRequestMethod("POST");
       conn.setDoOutput(true);
@@ -144,8 +177,14 @@ public class RestUtils {
       
       Reader in = new BufferedReader(new InputStreamReader(conn.getInputStream(), "UTF-8"));
 
-      for (int c; (c = in.read()) >= 0;)
-          System.out.print((char)c);
+      String response = "" ;
+      for (int c ; (c = in.read()) >= 0 ; ) {
+        response.concat( Character.toString( (char) c ) ) ;
+      }
+      log.debug( "Received response: " + response ) ;
+    } catch( Exception e ) {
+    	log.error( "POST to url failed!" , e ) ;
+    	throw e ;
+    }
   }
-  
 }
