@@ -116,14 +116,13 @@
 		<scope>compile</scope>
 	</dependency>
 
-
-
 	<dependency>
 		<groupId>io.rest-assured</groupId>
 		<artifactId>rest-assured</artifactId>
 		<version>3.0.6</version>
 		<scope>test</scope>
 	</dependency>
+
 	<dependency>
 		<groupId>org.jbehave</groupId>
 		<artifactId>jbehave-core</artifactId>
@@ -150,4 +149,64 @@
 			</plugin>
 		</plugins>
   </build>
+  
+  <profiles>
+  	<profile>
+  		<id>jbehave-tests</id>
+  		<build>
+  			<plugins>
+				<plugin>
+					<groupId>org.wildfly.swarm</groupId>
+					<artifactId>wildfly-swarm-plugin</artifactId>
+					<version>${version.wildfly.swarm}</version>
+					<executions>
+						<execution>
+							<id>teststart</id>
+							<phase>pre-integration-test</phase>
+							<goals>
+								<goal>start</goal>
+							</goals>
+						</execution>
+						<execution>
+							<id>teststop</id>
+							<phase>post-integration-test</phase>
+							<goals>
+								<goal>stop</goal>
+							</goals>
+						</execution>
+					</executions>
+				</plugin>
+  			
+  				<plugin>
+    				<groupId>org.jbehave</groupId>
+    				<artifactId>jbehave-maven-plugin</artifactId>
+    				<version>4.1</version>
+    				<executions>
+        				<execution>
+            				<id>run-stories-as-embeddables</id>
+	            			<phase>integration-test</phase>
+    	        			<configuration>
+     							<scope>test</scope>
+            	    			<includes>
+                	    			<include>**/DuckDashboardTester.java</include>
+                				</includes>
+                				<systemProperties>
+                    				<property>
+                      					<name>java.awt.headless</name>
+                      					<value>true</value>
+	                    			</property>
+    	            			</systemProperties>
+        	        			<ignoreFailureInStories>true</ignoreFailureInStories>
+            	    			<ignoreFailureInView>false</ignoreFailureInView>
+            				</configuration>
+            				<goals>
+                				<goal>run-stories-as-embeddables</goal>
+	            			</goals>
+    	    			</execution>
+    				</executions>
+				</plugin>
+  			</plugins>
+  		</build>
+  	</profile>
+  </profiles>
 </project>
