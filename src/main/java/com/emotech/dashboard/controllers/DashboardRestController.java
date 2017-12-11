@@ -39,9 +39,9 @@ public class DashboardRestController {
    * REST endpoint to post a duck.
    * @return ResponseEntity - either 200, or a 500 containing any exception message
    */
-  @RequestMapping( path="/duck" , method = RequestMethod.POST , produces = "application/json; charset=utf-8" )
+  @RequestMapping( path="/duck" , method = RequestMethod.PUT , produces = "application/json; charset=utf-8" )
   @ResponseBody
-  public ResponseEntity< String > postDuck() {
+  public ResponseEntity< String > putDuck() {
 	  
 	log.debug( "postDuck method invoked" ) ;
 	

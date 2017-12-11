@@ -39,11 +39,11 @@ public class DuckRestTester extends AbstractRestTester {
     this.getJsonUrl() ;
   }
   
-  @When( "the duck service is called with a POST request" )
+  @When( "the duck service is called with a PUT request" )
   public void postDuck() {
     this.setCurrentDuckCount() ;
     this.setPath( "duck" ) ;
-    this.postUrl() ;
+    this.putUrl() ;
   }
 
   @When( "the duck service is called with a DELETE request" )
@@ -53,10 +53,10 @@ public class DuckRestTester extends AbstractRestTester {
     this.deleteUrl() ;
   }
   
-  @When( "the duck service is called with a request that is not GET, POST or DELETE" )
+  @When( "the duck service is called with a request that is not GET, PUT or DELETE" )
   public void otherDuck() {
     this.setPath( "duck" ) ;
-    this.putUrl() ;
+    this.postUrl() ;
   }
   
   @When( "the current number of ducks is zero" )
@@ -74,7 +74,7 @@ public class DuckRestTester extends AbstractRestTester {
   @When( "the current number of ducks is non-zero" )
   public void checkNonZeroDucks() {
     this.setPath( "duck" ) ;
-    this.postUrl() ;
+    this.putUrl() ;
   }
   
   @When( "the current number of ducks is less than the maximum longint value" )
